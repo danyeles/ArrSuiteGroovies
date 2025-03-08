@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        JENKINS_URL = 'http://192.168.100.60:8181'
+        JENKINS_CREDENTIALS = credentials('jenkins-credentials-id')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -13,7 +18,7 @@ pipeline {
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
-                        def jobScript = readFile(file.path)
+                        def jobScript = readFile(file.path).replace('$', '\\$')
 
                         def xmlConfig = """
                         <flow-definition plugin="workflow-job">
@@ -32,18 +37,12 @@ pipeline {
                         </flow-definition>
                         """
 
-                        def response = httpRequest(
-                            url: "http://192.168.100.60:8181/createItem?name=${jobName}",
-                            httpMode: 'POST',
-                            contentType: 'APPLICATION_XML',
-                            acceptType: 'APPLICATION_XML',
-                            requestBody: xmlConfig,
-                            customHeaders: [[name: 'Authorization', value: "Basic ${credentials('jenkins-credentials-id')}"]]
-                        )
-
-                        if (response.status != 200) {
-                            error "Failed to create job ${jobName}: ${response}"
-                        }
+                        sh """
+                        curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
+                        --header 'Content-Type: application/json' \
+                        --user ${JENKINS_CREDENTIALS} \
+                        --data-binary '${xmlConfig}'
+                        """
                     }
                 }
             }
