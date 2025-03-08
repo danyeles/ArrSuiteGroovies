@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/your-seed-repo.git'
+                git 'https://github.com/danyeles/BazzarApp'
             }
         }
         stage('Generate Pipeline') {
@@ -16,7 +16,7 @@ pipeline {
                                 scm {
                                     git {
                                         remote {
-                                            url 'https://github.com/another-repo.git'
+                                            url 'https://github.com/danyeles/BazzarApp'
                                         }
                                         branches('main')
                                         scriptPath('Jenkinsfile')
