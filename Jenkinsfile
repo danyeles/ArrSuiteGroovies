@@ -13,7 +13,7 @@ pipeline {
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
-                        def jobScript = readFile(file.path)
+                        def jobScript = readFile(file.path).replace('$', '\\$')
                         jobDsl scriptText: '''
                         pipelineJob('${jobName}') {
                             definition {
