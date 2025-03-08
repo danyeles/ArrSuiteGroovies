@@ -10,21 +10,27 @@ pipeline {
         stage('Generate Pipeline') {
             steps {
                 script {
-                    pipelineJob('DeployDockerPipeline') {
+                    jobDsl scriptText: """
+                    pipelineJob('NewGeneratedPipeline') {
                         definition {
-                            cpsScm {
-                                scm {
-                                    git {
-                                        remote {
-                                            url 'https://github.com/danyeles/BazzarApp'
-                                        }
-                                        branches('main')
-                                        scriptPath('Jenkinsfile')
-                                    }
-                                }
+                            cps {
+                                script('''
+pipeline {
+    agent any
+    stages {
+        stage('Example Stage') {
+            steps {
+                echo 'This is a generated pipeline job!'
+            }
+        }
+    }
+}
+                                ''')
+                                sandbox()
                             }
                         }
                     }
+                    """
                 }
             }
         }
