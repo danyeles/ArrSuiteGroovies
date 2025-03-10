@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
+        JENKINS_USER = env.BUILD_USER_ID
         JENKINS_CREDENTIALS = credentials('githubdan') // Ensure this ID matches the one in Jenkins
     }
 
@@ -21,7 +22,7 @@ pipeline {
                         def jobScript = readFile(file.path).replace('$', '\\$')
 
                         // Obtain a crumb
-                        def crumbResponse = sh(script: "curl -s -u ${JENKINS_CREDENTIALS} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
+                        def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
                         def crumbJson = readJSON(text: crumbResponse)
                         def crumb = crumbJson.crumb
                         def crumbRequestField = crumbJson.crumbRequestField
@@ -47,7 +48,7 @@ pipeline {
                         curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
-                        --user ${JENKINS_CREDENTIALS} \
+                        --user ${JENKINS_USER}:${JENKINS_TOKEN} \
                         --data-binary '${xmlConfig}'
                         """
                     }
