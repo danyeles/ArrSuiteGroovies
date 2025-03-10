@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
-        JENKINS_CREDENTIALS = credentials('jenkins-credentials-id')
+        JENKINS_CREDENTIALS = credentials('githubdan') // Ensure this ID matches the one in Jenkins
     }
 
     stages {
@@ -19,6 +19,12 @@ pipeline {
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
                         def jobScript = readFile(file.path).replace('$', '\\$')
+
+                        // Obtain a crumb
+                        def crumbResponse = sh(script: "curl -s -u ${JENKINS_CREDENTIALS} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
+                        def crumbJson = readJSON(text: crumbResponse)
+                        def crumb = crumbJson.crumb
+                        def crumbRequestField = crumbJson.crumbRequestField
 
                         def xmlConfig = """
                         <flow-definition plugin="workflow-job">
@@ -39,7 +45,8 @@ pipeline {
 
                         sh """
                         curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
-                        --header 'Content-Type: application/json' \
+                        --header 'Content-Type: application/xml' \
+                        --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_CREDENTIALS} \
                         --data-binary '${xmlConfig}'
                         """
