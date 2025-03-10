@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
-        JENKINS_USER = 'env.BUILD_USER_ID'
-        JENKINS_TOKEN = credentials('jenkins_tolkien_id')
+        JENKINS_CREDENTIALS = credentials('jenkins_tolkien_id')
     }
 
     stages {
@@ -16,6 +15,7 @@ pipeline {
         stage('Generate Pipelines') {
             steps {
                 script {
+                    def username = env.BUILD_USER_ID ?: 'unknown-user'
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
@@ -25,7 +25,7 @@ pipeline {
                         echo "Job Script: ${jobScript}"
 
                         // Obtain a crumb
-                        def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
+                        def crumbResponse = sh(script: "curl -s -u ${username}:${JENKINS_CREDENTIALS} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
                         echo "Crumb Response: ${crumbResponse}"
 
                         def crumbJson = readJSON(text: crumbResponse)
@@ -49,7 +49,7 @@ pipeline {
                           <disabled>false</disabled>
                         </flow-definition>
                         """
-                        
+
                         // Debugging: Print the xmlConfig
                         echo "XML Config: ${xmlConfig}"
 
@@ -58,7 +58,7 @@ pipeline {
                         curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
-                        --user ${JENKINS_USER}:${JENKINS_TOKEN} \
+                        --user ${username}:${JENKINS_CREDENTIALS} \
                         --data-binary '${xmlConfig}'
                         """, returnStdout: true).trim()
                         echo "Create Job Response: ${createJobResponse}"
