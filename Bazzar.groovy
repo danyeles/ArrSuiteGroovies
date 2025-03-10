@@ -18,7 +18,7 @@ pipeline {
                                         remote {
                                             url 'https://github.com/danyeles/BazzarApp'
                                         }
-                                        branches('main')
+                                        branches('master')
                                         scriptPath('Jenkinsfile')
                                     }
                                 }
