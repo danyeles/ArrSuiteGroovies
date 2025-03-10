@@ -19,7 +19,7 @@ pipeline {
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
-                        def jobScript = readFile(file.path).trim().replace('$', '\\$')
+                        def jobScript = readFile(file.path).trim()
 
                         // Debugging: Print the job script
                         echo "Job Script: ${jobScript}"
@@ -30,6 +30,7 @@ pipeline {
                         def crumb = crumbJson.crumb
                         def crumbRequestField = crumbJson.crumbRequestField
 
+                        // Generate XML configuration
                         def xmlConfig = """
                         <flow-definition plugin="workflow-job">
                           <description></description>
@@ -46,7 +47,11 @@ pipeline {
                           <disabled>false</disabled>
                         </flow-definition>
                         """
+                        
+                        // Debugging: Print the xmlConfig
+                        echo "XML Config: ${xmlConfig}"
 
+                        // Send POST request to create pipeline job
                         sh """
                         curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
