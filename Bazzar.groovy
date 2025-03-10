@@ -10,6 +10,7 @@ pipeline {
         stage('Generate Pipeline') {
             steps {
                 script {
+                    jobDsl scriptText: """
                     pipelineJob('DeployDockerPipeline') {
                         definition {
                             cpsScm {
@@ -25,6 +26,7 @@ pipeline {
                             }
                         }
                     }
+                    """
                 }
             }
         }
