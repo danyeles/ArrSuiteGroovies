@@ -10,6 +10,7 @@ pipeline {
         stage('Generate Pipeline') {
             steps {
                 script {
+                    jobDsl scriptText: """
                     pipelineJob('DeployDockerPipeline') {
                         definition {
                             cpsScm {
@@ -18,13 +19,14 @@ pipeline {
                                         remote {
                                             url 'https://github.com/danyeles/BazzarApp'
                                         }
-                                        branches('main')
+                                        branches('master')
                                         scriptPath('Jenkinsfile')
                                     }
                                 }
                             }
                         }
                     }
+                    """
                 }
             }
         }
