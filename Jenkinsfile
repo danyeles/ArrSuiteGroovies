@@ -19,7 +19,10 @@ pipeline {
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
-                        def jobScript = readFile(file.path).replace('$', '\\$')
+                        def jobScript = readFile(file.path).trim().replace('$', '\\$')
+
+                        // Debugging: Print the job script
+                        echo "Job Script: ${jobScript}"
 
                         // Obtain a crumb
                         def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
