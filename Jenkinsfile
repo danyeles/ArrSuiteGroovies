@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
-        JENKINS_USER = 'env.BUILD_USER_ID' // Replace with your Jenkins username
+        JENKINS_USER = env.BUILD_USER_ID // Replace with your Jenkins username
         JENKINS_CREDENTIALS = credentials('jenkins_tolkien_id')
     }
 
@@ -16,7 +16,7 @@ pipeline {
         stage('Generate Pipelines') {
             steps {
                 script {
-                    echo "Job Script: ${JENKINS_USER}"
+                    echo "BUILD_USER_ID: ${JENKINS_USER}"
                     def username = env.BUILD_USER_ID ?: 'unknown-user'
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
