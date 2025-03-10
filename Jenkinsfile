@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
-        JENKINS_USER = env.BUILD_USER_ID
+        JENKINS_USER = 'env.BUILD_USER_ID'
         JENKINS_CREDENTIALS = credentials('githubdan') // Ensure this ID matches the one in Jenkins
     }
 
