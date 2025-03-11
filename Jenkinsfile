@@ -6,6 +6,7 @@ pipeline {
         JENKINS_USER = 'danyeles' // Replace with your Jenkins username
         JENKINS_TOKEN = credentials('jenkins-api-token-id')
         REPO_URL = 'https://github.com/danyeles/ArrSuiteGroovies.git' // Replace with your repository URL
+        SEED_JOB_NAME = 'ArrSeed' // Replace with the name of your seed job
     }
 
      stages {
