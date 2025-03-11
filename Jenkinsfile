@@ -27,7 +27,11 @@ pipeline {
 
                         // Obtain a crumb
                         def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
-                        echo "Crumb Response PART1: ${crumbResponse}"
+
+                        echo "LLEGA AQUI 1"
+                        echo "Crumb Response : ${crumbResponse}"
+
+                        echo "LLEGA AQUI 2"
 
                         if (crumbResponse.contains('<html>')) {
                             error "Invalid Crumb Response: ${crumbResponse}"
