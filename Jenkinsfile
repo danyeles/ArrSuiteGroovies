@@ -33,15 +33,18 @@ pipeline {
 
                         echo "LLEGA AQUI 2"
 
-                        // if (crumbResponse.contains('<html>')) {
-                        //     error "Invalid Crumb Response: ${crumbResponse}"
-                        // }
+                        if (crumbResponse.contains('<html>')) {
+                            error "Invalid Crumb Response: ${crumbResponse}"
+                        }
 
                         echo "LLEGA AQUI 3"
 
                         def crumbJson = readJSON(text: crumbResponse)
+                        echo "crumbJson Response : ${crumbJson}"
                         def crumb = crumbJson.crumb
+                        echo "Crumb Response : ${crumb}"
                         def crumbRequestField = crumbJson.crumbRequestField
+                        echo "crumbRequestField Response : ${crumbRequestField}"
 
                         echo "LLEGA AQUI 4"
 
@@ -68,7 +71,7 @@ pipeline {
 
                         // Send POST request to create pipeline job
                         def createJobResponse = sh(script: """
-                        curl -s -u -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
+                        curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
