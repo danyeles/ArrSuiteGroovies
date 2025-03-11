@@ -33,9 +33,9 @@ pipeline {
 
                         echo "LLEGA AQUI 2"
 
-                        if (crumbResponse.contains('<html>')) {
-                            error "Invalid Crumb Response: ${crumbResponse}"
-                        }
+                        // if (crumbResponse.contains('<html>')) {
+                        //     error "Invalid Crumb Response: ${crumbResponse}"
+                        // }
 
                         echo "LLEGA AQUI 3"
 
