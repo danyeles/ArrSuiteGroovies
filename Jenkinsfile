@@ -16,7 +16,6 @@ pipeline {
         stage('Generate Pipelines') {
             steps {
                 script {
-                    def username = env.BUILD_USER_ID ?: 'unknown-user'
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
@@ -26,6 +25,7 @@ pipeline {
                         echo "Job Script: ${jobScript}"
 
                         // Obtain a crumb
+                        echo "Obtaining Crumb..."
                         def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
 
                         echo "LLEGA AQUI 1"
@@ -68,12 +68,17 @@ pipeline {
 
                         // Send POST request to create pipeline job
                         def createJobResponse = sh(script: """
-                        curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
+                        curl -v -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
                         --data-binary '${xmlConfig}'
-                        """, returnStdout: true).trim()
+                        """, returnStdout: true, returnStatus: true)
+
+                        if (createJobResponse != 0) {
+                            error "Failed to create job: ${createJobResponse}"
+                        }
+
                         echo "Create Job Response: ${createJobResponse}"
                     }
                 }
