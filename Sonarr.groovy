@@ -1,10 +1,10 @@
-pipelineJob('Deploy BazArr Pipeline') {
+pipelineJob('Deploy SonArr Pipeline') {
     definition {
         cpsScm {
             scm {
                 git {
                     remote {
-                        url 'https://github.com/danyeles/BazzarApp'
+                        url 'https://github.com/danyeles/SonarrApp.git'
                     }
                     branches('master')
                     scriptPath('Jenkinsfile')
@@ -13,4 +13,3 @@ pipelineJob('Deploy BazArr Pipeline') {
         }
     }
 }
-
