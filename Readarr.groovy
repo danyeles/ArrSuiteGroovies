@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     jobDsl scriptText: """
-                    pipelineJob('DeployDockerPipeline') {
+                    pipelineJob('Deploy ReadArr Pipeline') {
                         definition {
                             cpsScm {
                                 scm {
