@@ -66,20 +66,22 @@ pipeline {
                         // Debugging: Print the xmlConfig
                         echo "XML Config: ${xmlConfig}"
 
-                        // Send POST request to create pipeline job
+                        // Send POST request to create pipeline job and capture server response
                         def createJobResponse = sh(script: """
                         curl -v -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
                         --data-urlencode '${xmlConfig}'
-                        """, returnStdout: true, returnStatus: true)
-
-                        if (createJobResponse != 0) {
-                            error "Failed to create job: ${createJobResponse}"
-                        }
+                        """, returnStdout: true, returnStatus: false)
 
                         echo "Create Job Response: ${createJobResponse}"
+
+                        if (createJobResponse.contains("Error")) {
+                            error "Failed to create job: ${createJobResponse}"
+                        } else {
+                            echo "Job created successfully: ${jobName}"
+                        }
                     }
                 }
             }
