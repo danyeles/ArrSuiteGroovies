@@ -8,7 +8,7 @@ pipeline {
         REPO_URL = 'https://github.com/danyeles/ArrSuiteGroovies.git' // Replace with your repository URL
     }
 
-    stages {
+     stages {
         stage('Checkout') {
             steps {
                 git url: "${REPO_URL}"
@@ -21,6 +21,9 @@ pipeline {
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
                         def jobScript = readFile(file.path).trim()
+                        def scmUrl = "${REPO_URL}"
+                        def branch = 'master' // Adjust the branch as necessary
+                        def scriptPath = file.path
 
                         // Debugging: Print the job script
                         echo "Job Script: ${jobScript}"
@@ -37,9 +40,22 @@ pipeline {
                           <description>Generated from Groovy script</description>
                           <keepDependencies>false</keepDependencies>
                           <properties/>
-                          <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps">
-                            <script>${jobScript}</script>
-                            <sandbox>true</sandbox>
+                          <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps">
+                            <scm class="hudson.plugins.git.GitSCM" plugin="git">
+                              <configVersion>2</configVersion>
+                              <userRemoteConfigs>
+                                <hudson.plugins.git.UserRemoteConfig>
+                                  <url>${scmUrl}</url>
+                                </hudson.plugins.git.UserRemoteConfig>
+                              </userRemoteConfigs>
+                              <branches>
+                                <hudson.plugins.git.BranchSpec>
+                                  <name>${branch}</name>
+                                </hudson.plugins.git.BranchSpec>
+                              </branches>
+                            </scm>
+                            <scriptPath>${scriptPath}</scriptPath>
+                            <lightweight>true</lightweight>
                           </definition>
                           <disabled>false</disabled>
                         </flow-definition>
