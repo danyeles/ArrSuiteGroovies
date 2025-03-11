@@ -8,87 +8,43 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/danyeles/ArrSuiteGroovies.git'
-            }
-        }
-        stage('Generate Pipelines') {
+        stage('Generate Test Job') {
             steps {
                 script {
-                    def files = findFiles(glob: '**/*.groovy')
-                    files.each { file ->
-                        def jobName = file.name.replace('.groovy', '')
-                        def jobScript = readFile(file.path).trim()
+                    def jobName = "TestJob"
 
-                        // Debugging: Print the job script
-                        echo "Job Script: ${jobScript}"
+                    // Obtain a crumb
+                    def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
+                    def crumbJson = readJSON(text: crumbResponse)
+                    def crumb = crumbJson.crumb
+                    def crumbRequestField = crumbJson.crumbRequestField
 
-                        // Obtain a crumb
-                        echo "Obtaining Crumb..."
-                        def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
-                        echo "Crumb Response: ${crumbResponse}"
+                    // Minimal valid XML configuration
+                    def xmlConfig = """
+                    <flow-definition plugin="workflow-job">
+                      <description>Test Job</description>
+                      <keepDependencies>false</keepDependencies>
+                      <properties/>
+                      <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps">
+                        <script>echo 'Hello, World!'</script>
+                        <sandbox>true</sandbox>
+                      </definition>
+                      <disabled>false</disabled>
+                    </flow-definition>
+                    """
 
-                        if (crumbResponse.contains('<html>')) {
-                            error "Invalid Crumb Response: ${crumbResponse}"
-                        }
-
-                        def crumbJson = readJSON(text: crumbResponse)
-                        def crumb = crumbJson.crumb
-                        def crumbRequestField = crumbJson.crumbRequestField
-
-                        // Generate and print raw XML configuration
-                        def rawXmlConfig = """
-                        <flow-definition plugin="workflow-job">
-                          <description></description>
-                          <keepDependencies>false</keepDependencies>
-                          <properties>
-                            <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-                              <triggers/>
-                            </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-                          </properties>
-                          <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps">
-                            <script>${jobScript}</script>
-                            <sandbox>true</sandbox>
-                          </definition>
-                          <disabled>false</disabled>
-                        </flow-definition>
-                        """
-
-                        echo "Raw XML Config: ${rawXmlConfig}"
-
-                        // Debugging: Print the xmlConfig
-                        echo "XML Config: ${rawXmlConfig}"
-
-                        // Send POST request to create pipeline job and capture server response
-                        def createJobResponse = sh(script: """
-                        curl -v -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
-                        --header 'Content-Type: application/xml' \
-                        --header '${crumbRequestField}: ${crumb}' \
-                        --user ${JENKINS_USER}:${JENKINS_TOKEN} \
-                        --data-binary '${rawXmlConfig}' > createJobResponse.txt
-                        """, returnStatus: true)
-
-                        def responseContent = readFile('createJobResponse.txt').trim()
-                        echo "Create Job Response: ${responseContent}"
-
-                        if (createJobResponse != 0 || responseContent.contains("Error")) {
-                            error "Failed to create job: ${responseContent}"
-                        } else {
-                            echo "Job created successfully: ${jobName}"
-                        }
-                    }
-                }
-            }
-        }
-        stage('List All Jobs') {
-            steps {
-                script {
-                    def listJobsResponse = sh(script: """
-                    curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/api/json?tree=jobs[name]
+                    // Send POST request to create minimal pipeline job
+                    def createJobResponse = sh(script: """
+                    curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
+                    --header 'Content-Type: application/xml' \
+                    --header '${crumbRequestField}: ${crumb}' \
+                    --user ${JENKINS_USER}:${JENKINS_TOKEN} \
+                    --data-binary @- <<DATA
+${xmlConfig}
+DATA
                     """, returnStdout: true).trim()
 
-                    echo "List Jobs Response: ${listJobsResponse}"
+                    echo "Create Job Response: ${createJobResponse}"
                 }
             }
         }
