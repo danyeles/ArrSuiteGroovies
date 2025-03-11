@@ -4,7 +4,7 @@ pipeline {
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
         JENKINS_USER = 'danyeles' // Replace with your Jenkins username
-        JENKINS_TOKEN = credentials('danyeles')
+        JENKINS_TOKEN = credentials('jenkins-api-token-id')
     }
 
     stages {
