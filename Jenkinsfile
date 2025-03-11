@@ -19,7 +19,7 @@ pipeline {
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
-                        def jobScript = URLEncoder.encode(readFile(file.path).trim(), "UTF-8")
+                        def jobScript = readFile(file.path).trim()
 
                         // Debugging: Print the job script
                         echo "Job Script: ${jobScript}"
@@ -46,7 +46,7 @@ pipeline {
                         echo "LLEGA AQUI 4"
 
                         // Generate XML configuration
-                        def xmlConfig = URLEncoder.encode("""
+                        def xmlConfig = """
                         <flow-definition plugin="workflow-job">
                           <description></description>
                           <keepDependencies>false</keepDependencies>
@@ -61,7 +61,7 @@ pipeline {
                           </definition>
                           <disabled>false</disabled>
                         </flow-definition>
-                        """, "UTF-8")
+                        """
 
                         // Debugging: Print the xmlConfig
                         echo "XML Config: ${xmlConfig}"
@@ -72,13 +72,14 @@ pipeline {
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
-                        --data-urlencode '${xmlConfig}'
-                        """, returnStdout: true, returnStatus: false)
+                        --data-binary '${xmlConfig}' > createJobResponse.txt
+                        """, returnStatus: true)
 
-                        echo "Create Job Response: ${createJobResponse}"
+                        def responseContent = readFile('createJobResponse.txt').trim()
+                        echo "Create Job Response: ${responseContent}"
 
-                        if (createJobResponse.contains("Error")) {
-                            error "Failed to create job: ${createJobResponse}"
+                        if (createJobResponse != 0 || responseContent.contains("Error")) {
+                            error "Failed to create job: ${responseContent}"
                         } else {
                             echo "Job created successfully: ${jobName}"
                         }
@@ -86,13 +87,13 @@ pipeline {
                 }
             }
         }
-                stage('List All Jobs') {
+        stage('List All Jobs') {
             steps {
                 script {
                     def listJobsResponse = sh(script: """
-                    curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/api/json?tree=jobs[name] \
+                    curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/api/json?tree=jobs[name]
                     """, returnStdout: true).trim()
-                    
+
                     echo "List Jobs Response: ${listJobsResponse}"
                 }
             }
