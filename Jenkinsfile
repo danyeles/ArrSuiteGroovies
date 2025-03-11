@@ -4,7 +4,7 @@ pipeline {
     environment {
         JENKINS_URL = 'http://192.168.100.60:8181'
         JENKINS_USER = 'danyeles' // Replace with your Jenkins username
-        JENKINS_TOKEN = credentials('jenkins_tolkien_id')
+        JENKINS_TOKEN = credentials('jenkins-api-token-id')
     }
 
     stages {
@@ -40,11 +40,8 @@ pipeline {
                         echo "LLEGA AQUI 3"
 
                         def crumbJson = readJSON(text: crumbResponse)
-                        echo "crumbJson Response : ${crumbJson}"
                         def crumb = crumbJson.crumb
-                        echo "Crumb Response : ${crumb}"
                         def crumbRequestField = crumbJson.crumbRequestField
-                        echo "crumbRequestField Response : ${crumbRequestField}"
 
                         echo "LLEGA AQUI 4"
 
