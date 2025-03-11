@@ -37,9 +37,13 @@ pipeline {
                             error "Invalid Crumb Response: ${crumbResponse}"
                         }
 
+                        echo "LLEGA AQUI 3"
+
                         def crumbJson = readJSON(text: crumbResponse)
                         def crumb = crumbJson.crumb
                         def crumbRequestField = crumbJson.crumbRequestField
+
+                        echo "LLEGA AQUI 4"
 
                         // Generate XML configuration
                         def xmlConfig = """
