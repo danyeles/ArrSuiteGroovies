@@ -86,5 +86,16 @@ pipeline {
                 }
             }
         }
+                stage('List All Jobs') {
+            steps {
+                script {
+                    def listJobsResponse = sh(script: """
+                    curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/api/json?tree=jobs[name] \
+                    """, returnStdout: true).trim()
+                    
+                    echo "List Jobs Response: ${listJobsResponse}"
+                }
+            }
+        }
     }
 }
