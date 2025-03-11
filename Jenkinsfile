@@ -7,7 +7,7 @@ pipeline {
         JENKINS_TOKEN = credentials('jenkins-api-token-id')
         REPO_URL = 'https://github.com/danyeles/ArrSuiteGroovies.git' // Replace with your repository URL
         SEED_JOB_NAME = 'ArrSeed' // Replace with the name of your seed job
-        SEED_JOB_URL = 'http://192.168.100.60:8181/job/SeedJobName' // Replace with the URL of your seed job
+        SEED_JOB_URL = 'http://192.168.100.60:8181/job/ArrSeed' // Replace with the URL of your seed job
     }
 
      stages {
