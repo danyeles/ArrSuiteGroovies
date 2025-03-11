@@ -19,7 +19,7 @@ pipeline {
                     def files = findFiles(glob: '**/*.groovy')
                     files.each { file ->
                         def jobName = file.name.replace('.groovy', '')
-                        def jobScript = readFile(file.path).trim()
+                        def jobScript = URLEncoder.encode(readFile(file.path).trim(), "UTF-8")
 
                         // Debugging: Print the job script
                         echo "Job Script: ${jobScript}"
@@ -46,7 +46,7 @@ pipeline {
                         echo "LLEGA AQUI 4"
 
                         // Generate XML configuration
-                        def xmlConfig = """
+                        def xmlConfig = URLEncoder.encode("""
                         <flow-definition plugin="workflow-job">
                           <description></description>
                           <keepDependencies>false</keepDependencies>
@@ -61,7 +61,7 @@ pipeline {
                           </definition>
                           <disabled>false</disabled>
                         </flow-definition>
-                        """
+                        """, "UTF-8")
 
                         // Debugging: Print the xmlConfig
                         echo "XML Config: ${xmlConfig}"
@@ -72,7 +72,7 @@ pipeline {
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
-                        --data-binary '${xmlConfig}'
+                        --data-urlencode '${xmlConfig}'
                         """, returnStdout: true, returnStatus: true)
 
                         if (createJobResponse != 0) {
