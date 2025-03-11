@@ -27,26 +27,18 @@ pipeline {
                         // Obtain a crumb
                         echo "Obtaining Crumb..."
                         def crumbResponse = sh(script: "curl -s -u ${JENKINS_USER}:${JENKINS_TOKEN} -X GET ${JENKINS_URL}/crumbIssuer/api/json", returnStdout: true).trim()
-
-                        echo "LLEGA AQUI 1"
-                        echo "Crumb Response : ${crumbResponse}"
-
-                        echo "LLEGA AQUI 2"
+                        echo "Crumb Response: ${crumbResponse}"
 
                         if (crumbResponse.contains('<html>')) {
                             error "Invalid Crumb Response: ${crumbResponse}"
                         }
 
-                        echo "LLEGA AQUI 3"
-
                         def crumbJson = readJSON(text: crumbResponse)
                         def crumb = crumbJson.crumb
                         def crumbRequestField = crumbJson.crumbRequestField
 
-                        echo "LLEGA AQUI 4"
-
-                        // Generate XML configuration
-                        def xmlConfig = """
+                        // Generate and print raw XML configuration
+                        def rawXmlConfig = """
                         <flow-definition plugin="workflow-job">
                           <description></description>
                           <keepDependencies>false</keepDependencies>
@@ -63,8 +55,13 @@ pipeline {
                         </flow-definition>
                         """
 
-                        // Debugging: Print the xmlConfig
-                        echo "XML Config: ${xmlConfig}"
+                        echo "Raw XML Config: ${rawXmlConfig}"
+
+                        // Encode XML configuration
+                        def xmlConfig = URLEncoder.encode(rawXmlConfig, "UTF-8")
+
+                        // Debugging: Print the encoded xmlConfig
+                        echo "Encoded XML Config: ${xmlConfig}"
 
                         // Send POST request to create pipeline job and capture server response
                         def createJobResponse = sh(script: """
@@ -72,7 +69,7 @@ pipeline {
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
-                        --data-binary '${xmlConfig}' > createJobResponse.txt
+                        --data-urlencode '${xmlConfig}' > createJobResponse.txt
                         """, returnStatus: true)
 
                         def responseContent = readFile('createJobResponse.txt').trim()
