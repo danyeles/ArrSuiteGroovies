@@ -68,7 +68,7 @@ pipeline {
 
                         // Send POST request to create pipeline job
                         def createJobResponse = sh(script: """
-                        curl -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
+                        curl -s -u -X POST '${JENKINS_URL}/createItem?name=${jobName}' \
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
