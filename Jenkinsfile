@@ -57,11 +57,8 @@ pipeline {
 
                         echo "Raw XML Config: ${rawXmlConfig}"
 
-                        // Encode XML configuration
-                        def xmlConfig = URLEncoder.encode(rawXmlConfig, "UTF-8")
-
-                        // Debugging: Print the encoded xmlConfig
-                        echo "Encoded XML Config: ${xmlConfig}"
+                        // Debugging: Print the xmlConfig
+                        echo "XML Config: ${rawXmlConfig}"
 
                         // Send POST request to create pipeline job and capture server response
                         def createJobResponse = sh(script: """
@@ -69,7 +66,7 @@ pipeline {
                         --header 'Content-Type: application/xml' \
                         --header '${crumbRequestField}: ${crumb}' \
                         --user ${JENKINS_USER}:${JENKINS_TOKEN} \
-                        --data-urlencode '${xmlConfig}' > createJobResponse.txt
+                        --data-binary '${rawXmlConfig}' > createJobResponse.txt
                         """, returnStatus: true)
 
                         def responseContent = readFile('createJobResponse.txt').trim()
