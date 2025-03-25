@@ -30,7 +30,7 @@
         * Add repo: https://github.com/danyeles/ArrSuiteGroovies.git
         * Save
 
-4. Install docker.io
+4. Install docker.io and run the below commands to give Jenkins permissions to run docker
    * sudo apt install docker.io
    * sudo usermod -aG docker jenkins
    * sudo systemctl restart jenkins
