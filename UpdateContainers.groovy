@@ -1,4 +1,4 @@
-pipelineJob('Deploy LidArrApp Pipeline') {
+pipelineJob('Update containers Pipeline') {
     definition {
         cpsScm {
             scm {
