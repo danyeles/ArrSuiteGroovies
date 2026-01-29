@@ -14,6 +14,10 @@
     * sudo apt-get update
     * sudo apt-get install jenkins
   
+    * Updated steps are located here:
+       * https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+       * https://pkg.jenkins.io/debian-stable/
+  
 3. Configure Jenkins http://LOCAL-IPADDRESS:8080/
     * Install Job DSL Plugin
         * Go to Manage Jenkins → Manage Plugins.
