@@ -22,9 +22,7 @@ pipeline {
 
         stage('whoami') {
             steps {
-              script {
                 whoami
-              }
             }
         }
     }
