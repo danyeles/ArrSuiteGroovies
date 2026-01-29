@@ -19,6 +19,14 @@ pipeline {
                        lookupStrategy: 'JENKINS_ROOT'
             }
         }
+
+        stage('whoami') {
+            steps {
+              script {
+                whoami
+              }
+            }
+        }
     }
 
     post {
