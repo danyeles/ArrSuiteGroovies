@@ -22,7 +22,9 @@ pipeline {
 
         stage('whoami') {
             steps {
-                whoami
+                echo 'Running whoami command...'
+                // Execute the whoami command and print the output directly to the console
+                sh 'whoami'
             }
         }
     }
