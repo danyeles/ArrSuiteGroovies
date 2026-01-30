@@ -68,4 +68,8 @@
 * Prowlarr:     http://LOCALIP:9696/
 * Bazarr:       http://LOCALIP:6767/
 
-10. These Pipeline jobs only work to deploy the apps, version update, stop, restart and other activities are in TODO; work thru the console in your system for any maintenance.
+10. Steps to fix permissions for jenkins to run docker
+* sudo usermod -aG docker jenkins
+* sudo systemctl restart jenkins
+
+12. These Pipeline jobs only work to deploy the apps, version update, stop, restart and other activities are in TODO; work thru the console in your system for any maintenance.
