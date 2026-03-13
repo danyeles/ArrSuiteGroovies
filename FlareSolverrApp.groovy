@@ -4,7 +4,7 @@ pipelineJob('Deploy FlareSolverrApp Pipeline') {
             scm {
                 git {
                     remote {
-                        url 'git@github.com:danyeles/FlareSolverrApp.git'
+                        url 'https://github.com/danyeles/FlareSolverrApp.git'
                     }
                     branches('master')
                     scriptPath('Jenkinsfile')
