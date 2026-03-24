@@ -4,7 +4,7 @@ pipelineJob('Deploy Seerr Pipeline') {
             scm {
                 git {
                     remote {
-                        url 'git@github.com:danyeles/SeerrApp.git'
+                        url 'https://github.com/danyeles/SeerrApp.git'
                     }
                     branches('master')
                     scriptPath('Jenkinsfile')
