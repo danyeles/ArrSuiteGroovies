@@ -4,7 +4,7 @@ pipelineJob('Deploy Jellyseerr Pipeline') {
             scm {
                 git {
                     remote {
-                        url 'git@github.com:danyeles/JellyseerrApp.git'
+                        url 'https://github.com/danyeles/JellyseerrApp.git'
                     }
                     branches('master')
                     scriptPath('Jenkinsfile')
