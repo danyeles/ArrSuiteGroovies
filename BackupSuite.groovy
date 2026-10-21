@@ -1,4 +1,7 @@
-pipelineJob('Backup Arr Suite') {
+pipelineJob('Media Stack Disaster Recovery') {
+
+    description('Full recovery backup for Arr Suite, Jellyfin, Jenkins and Docker host')
+
     definition {
         cpsScm {
             scm {
@@ -6,12 +9,11 @@ pipelineJob('Backup Arr Suite') {
                     remote {
                         url 'https://github.com/danyeles/BackupSuiteApp.git'
                     }
+
                     branches('master')
                     scriptPath('Jenkinsfile')
                 }
             }
         }
     }
-
-    description('Creates backups of Arr applications, Jellyfin, Jenkins and Docker container definitions.')
 }
